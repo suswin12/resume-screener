@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+{% block title %}Upload Resumes{% endblock %}
+{% block page_title %}Upload Resumes{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="form-card">
+      <p class="text-muted mb-4">Upload multiple resumes in PDF or DOCX format. Choose screening mode before uploading.</p>
+      
+      {% if not roles %}
+      <div class="alert alert-warning">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        No job roles configured. <a href="{{ url_for('seed_roles') }}">Load default IT roles</a> first.
+      </div>
+      {% else %}
+      
+      <form method="POST" enctype="multipart/form-data" id="uploadForm">
+        
+        <!-- STEP 1: JOB ROLE -->
+        <div class="mb-4">
+          <label class="form-label">① Select Job Role <span class="text-danger">*</span></label>
+          <select name="role_id" class="form-select" required>
+            <option value="">-- Choose a Job Role --</option>
+            {% for role in roles %}
+            <option value="{{ role.id }}">{{ role.title }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- STEP 2: FIX #1 + #4 — Candidate Type Toggle -->
+        <div class="mb-4">
+          <label class="form-label">② Candidate Type <span class="text-danger">*</span></label>
+          <div class="d-flex gap-0 mt-1">
+            <div class="type-toggle">
+              <input type="radio" name="candidate_type" id="type_fresher" value="fresher" onchange="toggleCandidateOptions()">
+              <label for="type_fresher"><i class="fas fa-graduation-cap me-2"></i>Fresher</label>
+              <input type="radio" name="candidate_type" id="type_experience" value="experience" checked onchange="toggleCandidateOptions()">
+              <label for="type_experience"><i class="fas fa-briefcase me-2"></i>Experienced</label>
+            </div>
+          </div>
+          <div class="form-hint mt-1">Fresher = students/new grads | Experienced = candidates with work history</div>
+        </div>
+
+        <!-- FIX #5: FRESHER OPTIONS PANEL -->
+        <div id="fresher_options" class="mb-4 p-3 rounded" style="background:#f5f3ff; border:2px solid #ede9fe; display:none;">
+          <h6 class="fw-bold text-purple mb-3" style="color:#7c3aed;"><i class="fas fa-user-graduate me-2"></i>Fresher Screening Options</h6>
+          <p class="text-muted" style="font-size:0.82rem; margin-bottom:12px;">
+            For freshers, screening focuses on <strong>Core Skills</strong> + <strong>Projects</strong>. 
+            Optionally require internship experience.
+          </p>
+          
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="form-check form-switch p-3 rounded" style="background:#fff; border:1px solid #ddd6fe; ">
+                <input class="form-check-input" type="checkbox" name="require_internship" id="require_internship" checked>
+                <label class="form-check-label fw-semibold" for="require_internship">
+                  <i class="fas fa-building me-1 text-purple" style="color:#7c3aed;"></i>
+                  Require Internship Experience
+                </label>
+                <div class="form-hint">Check this if internship is mandatory for freshers</div>
+              </div>
+            </div>
+         
+          </div>
+
+       
+        </div>
+
+        <!-- FIX #1 + #4: EXPERIENCE OPTIONS PANEL -->
+        <div id="experience_options" class="mb-4 p-3 rounded" style="background:#eff6ff; border:2px solid #dbeafe;">
+          <h6 class="fw-bold mb-3" style="color:#1d4ed8;"><i class="fas fa-briefcase me-2"></i>Experience Screening Options</h6>
+          <p class="text-muted" style="font-size:0.82rem; margin-bottom:12px;">
+            Set a <strong>year range filter</strong> to screen only candidates with matching work experience.
+          </p>
+          
+          <div class="row g-3">
+            <div class="col-md-5">
+              <label class="form-label">Min. Experience (years)</label>
+              <input type="number" name="min_years" id="min_years" class="form-control" 
+                     placeholder="e.g. 1" min="0" max="20" step="0.5">
+              <div class="form-hint">Leave blank for no minimum</div>
+            </div>
+            <div class="col-md-2 text-center d-flex align-items-center justify-content-center">
+              <span class="text-muted fw-bold">to</span>
+            </div>
+            <div class="col-md-5">
+              <label class="form-label">Max. Experience (years)</label>
+              <input type="number" name="max_years" id="max_years" class="form-control" 
+                     placeholder="e.g. 3" min="0" max="30" step="0.5">
+              <div class="form-hint">Leave blank for no maximum</div>
+            </div>
+          </div>
+
+          <div class="mt-3 p-2 rounded" style="background:#dbeafe; font-size:0.8rem; color:#1d4ed8;">
+            <i class="fas fa-info-circle me-1"></i>
+            <strong>Example:</strong> Enter 1–3 to filter only candidates with 1 to 3 years of experience. 
+            Candidates outside this range will be automatically rejected.
+          </div>
+        </div>
+        
+        <!-- STEP 3: UPLOAD FILES -->
+        <div class="mb-4">
+          <label class="form-label">③ Upload Resumes (PDF / DOCX) <span class="text-danger">*</span></label>
+          <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+            <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+            <h5 class="text-muted">Click or drag files here</h5>
+            <p class="text-muted mb-1">Supports PDF and DOCX formats</p>
+            <small class="text-muted">Multiple files supported — max 16MB total</small>
+            <input type="file" name="resumes" id="fileInput" multiple accept=".pdf,.docx" class="d-none">
+          </div>
+          <div id="fileList" class="mt-2"></div>
+        </div>
+        
+        <!-- SCORING INFO -->
+       
+        
+        <button type="submit" class="btn btn-primary w-100 py-2" id="submitBtn">
+          <i class="fas fa-search me-2"></i>Screen Resumes Now
+        </button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const fileInput = document.getElementById('fileInput');
+const uploadZone = document.getElementById('uploadZone');
+const fileList = document.getElementById('fileList');
+const submitBtn = document.getElementById('submitBtn');
+
+fileInput?.addEventListener('change', updateFileList);
+
+uploadZone?.addEventListener('dragover', e => {
+  e.preventDefault();
+  uploadZone.classList.add('dragover');
+});
+uploadZone?.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+uploadZone?.addEventListener('drop', e => {
+  e.preventDefault();
+  uploadZone.classList.remove('dragover');
+  fileInput.files = e.dataTransfer.files;
+  updateFileList();
+});
+
+function updateFileList() {
+  const files = Array.from(fileInput.files);
+  if (!files.length) return;
+  
+  const icons = { pdf: '📄', docx: '📝' };
+  fileList.innerHTML = `
+    <div class="p-2 bg-light rounded border">
+      <small class="text-muted fw-bold">${files.length} file(s) selected:</small>
+      ${files.map(f => {
+        const ext = f.name.split('.').pop().toLowerCase();
+        const size = (f.size / 1024).toFixed(0);
+        return `<div class="d-flex align-items-center gap-2 mt-1">
+          <span>${icons[ext] || '📁'}</span>
+          <small class="text-truncate flex-grow-1">${f.name}</small>
+          <small class="text-muted">${size} KB</small>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+}
+
+// FIX #1/#4/#5: Toggle panels based on candidate type
+function toggleCandidateOptions() {
+  const fresher = document.getElementById('type_fresher').checked;
+  document.getElementById('fresher_options').style.display = fresher ? 'block' : 'none';
+  document.getElementById('experience_options').style.display = fresher ? 'none' : 'block';
+}
+// Run on page load
+toggleCandidateOptions();
+
+document.getElementById('uploadForm')?.addEventListener('submit', function() {
+  if (submitBtn) {
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Screening in progress... please wait';
+    submitBtn.disabled = true;
+  }
+});
+</script>
+{% endblock %}

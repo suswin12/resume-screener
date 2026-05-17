@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Job Roles{% endblock %}
+{% block page_title %}Job Roles{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <p class="text-muted mb-0">Define job roles with keyword sets for automated screening.</p>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('seed_roles') }}" class="btn btn-outline-secondary">
+      <i class="fas fa-database me-1"></i>Load Default IT Roles
+    </a>
+    <a href="{{ url_for('new_role') }}" class="btn btn-primary">
+      <i class="fas fa-plus me-1"></i>New Job Role
+    </a>
+  </div>
+</div>
+
+{% if roles %}
+<div class="row g-3">
+  {% for role in roles %}
+  <div class="col-md-6 col-xl-4">
+    <div class="stat-card h-100">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <h6 class="fw-bold mb-0">{{ role.title }}</h6>
+        <span class="badge bg-primary-subtle text-primary" style="font-size:0.7rem;">
+          Threshold: {{ role.min_threshold }}%
+        </span>
+      </div>
+
+      {% if role.description %}
+      <p class="text-muted" style="font-size:0.8rem; margin-bottom:10px;">{{ role.description }}</p>
+      {% endif %}
+
+      <div class="mb-2">
+        <small class="text-muted d-block mb-1"><strong>Core Skills:</strong></small>
+        {% set skills = role.core_skills | fromjson %}
+        {% for s in skills[:5] %}
+          <span class="kw-tag">{{ s }}</span>
+        {% endfor %}
+        {% if skills | length > 5 %}
+          <span class="kw-tag">+{{ skills | length - 5 }} more</span>
+        {% endif %}
+      </div>
+
+      <div class="row g-1 mb-3" style="font-size:0.75rem;">
+        <div class="col-6">
+          <div class="d-flex justify-content-between">
+            <span class="text-muted">Core Skills</span>
+            <strong>{{ (role.core_weight * 100) | int }}%</strong>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="d-flex justify-content-between">
+            <span class="text-muted">Tools</span>
+            <strong>{{ (role.tools_weight * 100) | int }}%</strong>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="d-flex justify-content-between">
+            <span class="text-muted">Projects</span>
+            <strong>{{ (role.projects_weight * 100) | int }}%</strong>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="d-flex justify-content-between">
+            <span class="text-muted">Internship</span>
+            <strong>{{ (role.internship_weight * 100) | int }}%</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2">
+        <a href="{{ url_for('edit_role', role_id=role.id) }}" class="btn btn-sm btn-outline-primary flex-grow-1">
+          <i class="fas fa-edit me-1"></i>Edit
+        </a>
+        <a href="{{ url_for('results') }}?role_id={{ role.id }}" class="btn btn-sm btn-outline-success flex-grow-1">
+          <i class="fas fa-eye me-1"></i>Results
+        </a>
+        <form method="POST" action="{{ url_for('delete_role', role_id=role.id) }}"
+              onsubmit="return confirm('Delete this role?')">
+          <button class="btn btn-sm btn-outline-danger">
+            <i class="fas fa-trash"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% else %}
+<div class="text-center py-5 form-card">
+  <i class="fas fa-briefcase fa-4x text-muted mb-3"></i>
+  <h5 class="text-muted">No Job Roles Yet</h5>
+  <p class="text-muted">Load default IT roles or create your own.</p>
+  <a href="{{ url_for('seed_roles') }}" class="btn btn-primary me-2">
+    <i class="fas fa-database me-1"></i>Load 10 Default IT Roles
+  </a>
+  <a href="{{ url_for('new_role') }}" class="btn btn-outline-primary">
+    <i class="fas fa-plus me-1"></i>Create Custom Role
+  </a>
+</div>
+{% endif %}
+
+{% endblock %}

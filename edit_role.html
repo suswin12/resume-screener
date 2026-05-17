@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Edit Role{% endblock %}
+{% block page_title %}Edit Job Role{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-9">
+    <div class="form-card">
+      <p class="text-muted mb-4">Update the job role keywords and scoring weights.</p>
+
+      <form method="POST" action="{{ url_for('edit_role', role_id=role.id) }}">
+        <div class="mb-4">
+          <h6 class="fw-bold text-primary border-bottom pb-2 mb-3"><i class="fas fa-info-circle me-2"></i>Basic Information</h6>
+          <div class="row g-3">
+            <div class="col-md-8">
+              <label class="form-label">Job Role Title <span class="text-danger">*</span></label>
+              <input type="text" name="title" class="form-control" value="{{ role.title }}" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Min. Score Threshold (%)</label>
+              <input type="number" name="min_threshold" class="form-control" value="{{ role.min_threshold }}" min="10" max="100">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Description</label>
+              <textarea name="description" class="form-control" rows="2">{{ role.description or '' }}</textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <h6 class="fw-bold text-primary border-bottom pb-2 mb-3"><i class="fas fa-tags me-2"></i>Keyword Categories</h6>
+          <div class="row g-3">
+
+            <div class="col-md-6">
+              <label class="form-label">Core Skills <span class="badge bg-danger" style="font-size:0.65rem;">40% weight</span></label>
+              <textarea name="core_skills" class="form-control" rows="3">{{ role.core_skills | fromjson | join(', ') }}</textarea>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Tools &amp; Technologies <span class="badge bg-warning text-dark" style="font-size:0.65rem;">25% weight</span></label>
+              <textarea name="tools" class="form-control" rows="3">{{ role.tools | fromjson | join(', ') }}</textarea>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Project Keywords <span class="badge bg-info text-dark" style="font-size:0.65rem;">15% weight</span></label>
+              <textarea name="project_keywords" class="form-control" rows="3">{{ role.project_keywords | fromjson | join(', ') }}</textarea>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Internship Keywords <span class="badge bg-secondary" style="font-size:0.65rem;">10% weight</span></label>
+              <textarea name="internship_keywords" class="form-control" rows="3">{{ role.internship_keywords | fromjson | join(', ') }}</textarea>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Experience Keywords <span class="badge bg-secondary" style="font-size:0.65rem;">10% weight</span></label>
+              <textarea name="experience_keywords" class="form-control" rows="3">{{ role.experience_keywords | fromjson | join(', ') }}</textarea>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <h6 class="fw-bold text-primary border-bottom pb-2 mb-3"><i class="fas fa-sliders-h me-2"></i>Score Weights</h6>
+          <div class="row g-3">
+            <div class="col">
+              <label class="form-label">Core Skills</label>
+              <input type="number" name="core_weight" class="form-control" value="{{ role.core_weight }}" step="0.05" min="0" max="1">
+            </div>
+            <div class="col">
+              <label class="form-label">Tools</label>
+              <input type="number" name="tools_weight" class="form-control" value="{{ role.tools_weight }}" step="0.05" min="0" max="1">
+            </div>
+            <div class="col">
+              <label class="form-label">Projects</label>
+              <input type="number" name="projects_weight" class="form-control" value="{{ role.projects_weight }}" step="0.05" min="0" max="1">
+            </div>
+            <div class="col">
+              <label class="form-label">Internship</label>
+              <input type="number" name="internship_weight" class="form-control" value="{{ role.internship_weight }}" step="0.05" min="0" max="1">
+            </div>
+            <div class="col">
+              <label class="form-label">Experience</label>
+              <input type="number" name="experience_weight" class="form-control" value="{{ role.experience_weight }}" step="0.05" min="0" max="1">
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary px-4"><i class="fas fa-save me-2"></i>Save Changes</button>
+          <a href="{{ url_for('roles') }}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
