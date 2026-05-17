@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Email Settings{% endblock %}
+{% block page_title %}Email Settings{% endblock %}
+{% set popup_notifications = popup_notifications if popup_notifications is defined else [] %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    
+    <div class="alert alert-info mb-3">
+      <i class="fas fa-shield-alt me-2"></i>
+      <strong>Security Note:</strong> For Gmail, use an App Password (not your main password).
+      Enable 2FA and generate an App Password at <a href="https://myaccount.google.com/apppasswords" target="_blank">myaccount.google.com/apppasswords</a>.
+    </div>
+    
+    <div class="form-card">
+      <form method="POST">
+        <div class="mb-4">
+          <h6 class="fw-bold text-primary border-bottom pb-2 mb-3"><i class="fas fa-server me-2"></i>SMTP Configuration</h6>
+          <div class="row g-3">
+            <div class="col-md-8">
+              <label class="form-label">SMTP Host</label>
+              <input type="text" name="smtp_host" class="form-control" 
+                     value="{{ settings.smtp_host if settings else 'smtp.gmail.com' }}"
+                     placeholder="smtp.gmail.com">
+              <div class="form-hint">Gmail: smtp.gmail.com | Outlook: smtp.office365.com</div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">SMTP Port</label>
+              <input type="number" name="smtp_port" class="form-control" 
+                     value="{{ settings.smtp_port if settings else 587 }}">
+              <div class="form-hint">TLS: 587, SSL: 465</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Sender Email</label>
+              <input type="email" name="sender_email" class="form-control" 
+                     value="{{ settings.sender_email if settings else '' }}"
+                     placeholder="hr@yourcompany.com">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Sender Password / App Password</label>
+              <input type="password" name="sender_password" class="form-control"
+                     value="{{ settings.sender_password if settings else '' }}"
+                     placeholder="Gmail App Password">
+            </div>
+          </div>
+        </div>
+        
+        <div class="mb-4">
+          <h6 class="fw-bold text-primary border-bottom pb-2 mb-3"><i class="fas fa-envelope me-2"></i>Email Template</h6>
+          
+          <div class="alert alert-secondary py-2 mb-3">
+            <small>
+              <strong>Available Placeholders:</strong>
+              <code>{name}</code> — Candidate name &nbsp;|&nbsp;
+              <code>{job_role}</code> — Job role title
+            </small>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Email Subject</label>
+            <input type="text" name="email_subject" class="form-control"
+                   value="{{ settings.email_subject if settings else 'Interview Invitation - {job_role}' }}">
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Email Body</label>
+            <textarea name="email_body" class="form-control" rows="10">{% if settings %}{{ settings.email_body }}{% else %}Dear {name},
+
+Congratulations! We are pleased to inform you that your application for the position of {job_role} has been shortlisted.
+
+We would like to invite you for an interview. Our HR team will contact you shortly with the interview schedule, date, time, and venue details.
+
+Please ensure you carry the following documents to the interview:
+- Updated Resume
+- Educational Certificates
+- Government Photo ID
+
+We look forward to meeting you.
+
+Best Regards,
+HR Recruitment Team{% endif %}</textarea>
+          </div>
+        </div>
+        
+        <button type="submit" class="btn btn-primary px-4">
+          <i class="fas fa-save me-2"></i>Save Email Settings
+        </button>
+      </form>
+    </div>
+    
+    <!-- EMAIL PREVIEW -->
+    <div class="form-card mt-3">
+      <h6 class="fw-bold mb-3"><i class="fas fa-eye me-2 text-primary"></i>Email Preview</h6>
+      <div style="border:1px solid #e2e8f0; border-radius:8px; overflow:hidden;">
+        <div style="background:#2563eb; padding:15px 20px;">
+          <h5 style="color:white; margin:0;">Interview Invitation</h5>
+        </div>
+        <div style="padding:20px; background:#f8fafc;">
+          <p><strong>Subject:</strong> Interview Invitation - Java Full Stack Developer</p>
+          <hr>
+          <p>Dear <strong>Rahul Sharma</strong>,</p>
+          <p>Congratulations! We are pleased to inform you that your application for the position of <strong>Java Full Stack Developer</strong> has been shortlisted.</p>
+          <p>We would like to invite you for an interview. Our HR team will contact you shortly...</p>
+        </div>
+      </div>
+      <small class="text-muted mt-2 d-block">* Preview with sample data. Actual emails use real candidate name and job role.</small>
+    </div>
+  </div>
+</div>
+{% endblock %}
