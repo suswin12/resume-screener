@@ -2,6 +2,8 @@
 
 A web-based recruitment management system designed to automate resume screening and simplify the interview process for recruiters and HR teams.
 
+live : https://resume-screener-chxk.onrender.com
+
 ## Features
 
 - Resume Upload & Analysis
