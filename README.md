@@ -32,13 +32,6 @@ A web-based recruitment management system designed to automate resume screening 
 
 The main objective of this project is to simplify recruitment workflows by automating resume screening and interview management processes.
 
-## Future Enhancements
-
-- Advanced Resume Ranking
-- Admin Dashboard
-- Analytics & Reports
-- Multi-Job Role Support
-- Improved Candidate Matching System
 
 ## Author
 
